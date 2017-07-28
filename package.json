@@ -1,6 +1,6 @@
 {
   "name": "load-queue",
-  "version": "0.3",
+  "version": "1.0.3",
   "description": "Designed to allow running task in a queue with parallel support. Can be used for image or file loading.",
   "main": "dist/load-queue.js",
   "repository": "https://github.com/pionl/load-queue",
