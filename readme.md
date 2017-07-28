@@ -1,5 +1,5 @@
 # Load queue 
-Designed to allow running task in a queue with parallel support. Can be used for image (package) or file loading.
+Designed to allow running task in a queue with parallel support. Can be used for image ([package](https://github.com/pionl/load-image-queue)) or file loading.
 
 * Small library: 6kb minified.
 * Simple queue with custom task defined with simple function
@@ -60,6 +60,11 @@ You must provide your own task implementation. The function will accept 3 argume
 3. failure - A callback for failure that accepts an error `Error` object
 
 ```javascript
+/**
+ * @param {QueueEntry} entry
+ * @param {function} success
+ * @param {function} failure
+ */
 var loaderTask = function (entry, success, failure) {
         // ... loading entry.url
         setTimeout(function () {
