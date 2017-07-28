@@ -1,6 +1,6 @@
 {
   "name": "load-queue",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Designed to allow running task in a queue with parallel support. Can be used for image or file loading.",
   "main": "dist/normalizer.js",
   "repository": "https://github.com/pionl/load-queue",
@@ -47,5 +47,10 @@
     "jest": "^19.0.2",
     "rimraf": "^2.6.1",
     "webpack": "^2.4.1"
-  }
+  },
+  "keywords": [
+    "javascript",
+    "queue",
+    "load-queue"
+  ]
 }
