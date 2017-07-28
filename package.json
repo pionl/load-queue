@@ -1,6 +1,6 @@
 {
   "name": "load-queue",
-  "version": "1.0.2",
+  "version": "0.3",
   "description": "Designed to allow running task in a queue with parallel support. Can be used for image or file loading.",
   "main": "dist/load-queue.js",
   "repository": "https://github.com/pionl/load-queue",
@@ -16,6 +16,9 @@
       "text-summary"
     ]
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build-pre": "rimraf dist",
     "build-dev": "NODE_ENV=development webpack --progress --colors",
