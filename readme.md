@@ -136,3 +136,10 @@ var loaderTask = function (entry, success, failure) {
         }
     }
 ```
+## Copyright and License
+
+[load-queue](https://github.com/pionl/load-queue)
+was written by [Martin Kluska](http://kluska.cz) and is released under the 
+[MIT License](LICENSE.md).
+
+Copyright (c) 2017 Martin Kluska
