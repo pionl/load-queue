@@ -92,8 +92,8 @@ To add a new url to load queue, just call `add(url, success, error)`. The add me
 given url.
 
 ```javascript
-var entry = queue.add('url', function(customVar, customVar2) {
-    console.log(customVar, customVar2)
+var entry = queue.add('url', function(url, customVar, customVar2) {
+    console.log(url, customVar, customVar2)
 }, function(error) {
   console.log(error)
 })
