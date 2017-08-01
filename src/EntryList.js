@@ -7,12 +7,22 @@ export default class EntryList {
     }
 
     /**
+     * Returns an entry for given key
+     * @param {string} url
+     * @return {QueueEntry|null}
+     */
+    get (url) {
+        return this.list[url]
+    }
+
+    /**
      * Checks if url is in the list
      * @param {string} url
      * @return {boolean}
      */
     has (url) {
-        return typeof this.list[url] === 'object'
+        const entry = this.get(url)
+        return typeof entry === 'object'
     }
 
     /**
@@ -51,7 +61,7 @@ export default class EntryList {
      * @return {QueueEntry|null}
      */
     pull (url) {
-        const entry = this.list[url]
+        const entry = this.get(url)
 
         // Delete the entry if valid and return value
         if (typeof entry === 'object') {

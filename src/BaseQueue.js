@@ -2,8 +2,14 @@ import QueueEntry from './QueueEntry'
 import QueueCore from './QueueCore'
 
 export default class BaseQueue {
-    constructor (LoadTaskClass, concurrentJobs = 1) {
-        this.core = new QueueCore(LoadTaskClass, concurrentJobs)
+    /**
+     * @param LoadTaskClass
+     * @param concurrentJobs
+     * @param startTimeoutTime Defines if the start will use timeout function to throttle calls and give
+     * time for start -> cancel (when user scrolls in list and etc). Set null to turn it off.
+     */
+    constructor (LoadTaskClass, concurrentJobs = 1, startTimeoutTime = undefined) {
+        this.core = new QueueCore(LoadTaskClass, concurrentJobs, startTimeoutTime)
     }
 
     /**

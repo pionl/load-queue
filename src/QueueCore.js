@@ -11,6 +11,31 @@ function isCanceled (loadingList, url) {
 }
 
 /**
+ * Tries to merge success/error callbacks for existing entry
+ * in given list. Returns true if merged. Used for multiple callback calls
+ * for same entry
+ *
+ * @param {EntryList} list
+ * @param {QueueEntry} entry
+ * @return {boolean}
+ */
+function tryToMergeEntryInList(list, entry) {
+    if (list.has(entry.url) === false) {
+        return false
+    }
+    // Get the entry
+    const loadingEntry = list.get(entry.url)
+
+    // Pass new callbacks to the entry - will be triggered all requests
+    loadingEntry.callbacks.error.push(entry.callbacks.error[0])
+    loadingEntry.callbacks.success.push(entry.callbacks.success[0])
+
+    // Copy the executing task
+    entry.task = loadingEntry.task
+    return true
+}
+
+/**
  * @callback TaskLoadSuccess
  * @param ...arguments List of arguments that is required to send
  */
@@ -30,8 +55,10 @@ export default class QueueCore {
     /**
      * @param {LoadTask} LoadTaskClass
      * @param {Number} concurrentJobs
+     * @param {Number|null|undefined} startTimeoutTime Defines if the start will use timeout function to throttle calls and give
+     * time for start -> cancel (when user scrolls in list and etc). Set null to turn it off.
      */
-    constructor (LoadTaskClass, concurrentJobs = 1) {
+    constructor (LoadTaskClass, concurrentJobs = 1, startTimeoutTime = undefined) {
         // Public
         this.concurrentJobs = concurrentJobs
         this.queue = new EntryList()
@@ -47,6 +74,17 @@ export default class QueueCore {
          * @type {function}
          */
         this.onEntryError = null
+        /**
+         * The start timeout time
+         * @type {Number|null}
+         */
+        this.startTimeoutTime = typeof startTimeoutTime === 'undefined' ? 50 : startTimeoutTime
+        /**
+         * Add more time between starting queue - when canceling more items, the start can request multiple
+         * items at once - when scrolling, item is added to list and then canceled.
+         * @type {number|null}
+         */
+        this.startTimeout = null
     }
 
     /**
@@ -55,11 +93,12 @@ export default class QueueCore {
      * @return {QueueCore}
      */
     add (entry) {
-        // Check if the item is already loaded and just replace the value
-        // in load list (to use new callbacks), or use queue
-        if (this.loading.has(entry.url)) {
-            this.loading.push(entry)
-        } else {
+        // Check if the item is already loaded and append callbacks
+        // in load list, if not loading, try to merge already existing
+        // queue entry or add it to a queue
+        if (tryToMergeEntryInList(this.loading, entry)) {
+            return this
+        } else if (tryToMergeEntryInList(this.queue, entry) === false) {
             this.queue.push(entry)
         }
 
@@ -67,7 +106,9 @@ export default class QueueCore {
     }
 
     /**
-     * Starts the queue, returns true if entry has started
+     * Starts the queue, returns true if the queue could start (when timeout is used) or if it started (timeout not used).
+     * Uses setTimeout to prevent multiple calls.
+     *
      * @return {boolean}
      */
     start () {
@@ -76,7 +117,20 @@ export default class QueueCore {
             return false
         }
 
-        this.forceStart()
+        // Clear last request for start
+        if (this.startTimeout !== null) {
+            clearTimeout(this.startTimeout)
+        }
+
+        // Timeout is turned off
+        if (this.startTimeoutTime === null) {
+            return this.forceStart()
+        }
+
+        // Start the request
+        this.startTimeout = setTimeout(() => {
+            this.forceStart()
+        }, this.startTimeoutTime) // 50ms is enough to handle scroll start -> cancel transitions
     }
 
     /**

@@ -54,7 +54,7 @@ var queue = new CachedQueue(loaderTask)
 
 ## Usage
 
-You must provide your own task implementation. The function will accept 3 arguments:
+Before constructing queue, you must provide your own task implementation. The function will accept 3 arguments:
 1. entry - An QueueEntry with an url `entry.url`
 2. success - A callback that accepts any custom arguments that will be passed to your custom callback
 3. failure - A callback for failure that accepts an error `Error` object
@@ -78,7 +78,12 @@ var loaderTask = function (entry, success, failure) {
     }
 ```
 
-`Queue` construct accepts the task function and number of concurrent jobs that can be ran (default 1).
+__Queue construct accepts:__
+ 1. The task function.
+ 2. Number of concurrent jobs that can be ran (default 1).
+ 3. start timeout - defines if the start will use timeout function to throttle calls and 
+ give time for start -> cancel use case (when user scrolls in list and etc). Set null to turn it off. 
+ Default is 50ms (which is enough for fast scroll)
 
 ```javascript
 var queue = new Queue(loaderTask)
