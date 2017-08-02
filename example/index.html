@@ -3,39 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <title>Load queue example</title>
-    <script src="../dist/load-queue.min.js" type="text/javascript"></script>
+    <script src="../dist/load-queue.js" type="text/javascript"></script>
 </head>
+<style>
+    .log {
+        width: 50%;
+        padding: 20px;
+        box-sizing: border-box;
+        float: left;
+        height: 400px;
+        overflow: scroll;
+    }
+</style>
 <body>
 
-<h1>Load queue example</h1>
-<div id="log"></div>
+<div class="log">
+    <h1>Load queue example</h1>
+    <div id="log"></div>
+</div>
+<div class="log">
+    <h1>Load queue example - concurrent</h1>
+    <div id="log2"></div>
+</div>
+<div style="clear: both;"></div>
 <script>
-    var log = document.getElementById('log')
-
-    function write (text) {
-        log.innerHTML += text + '<br/>'
-    }
-    // The custom loader task that will accept entry object (QueryEntry)
-    var loaderTask = function (entry, success, failure) {
-        write('Loading ' + entry.url)
-        setTimeout(function () {
-            if (entry.url === 'url1') {
-                failure(new Error('Failed!'))
-            } else {
-                success('my custom var', 'custom var 2')
-            }
-        }, 1000)
+    function getRandomArbitrary(min, max) {
+        return Math.random() * (max - min) + min;
     }
 
-    // Build the queue
-    var queue = new LoadQueue.default(loaderTask)
-    for (var i = 0; i < 20; i++) {
-        queue.add('url' + i, function (url, customVar, customVar1) {
-            write('Loaded ' + url + ', vars: ' + customVar + ', ' + customVar1)
-        }, function (url, error) {
-            write('Error ' + url + ' - ' + error.message)
-        })
+    function start (logDiv, jobs) {
+        var log = document.getElementById(logDiv)
+
+        function write (text) {
+            log.innerHTML = text + '<br/>' + log.innerHTML
+        }
+
+        // The custom loader task that will accept entry object (QueryEntry)
+        var loaderTask = function (entry, success, failure) {
+            write('Loading ' + entry.url)
+            setTimeout(function () {
+                if (entry.url === 'url1') {
+                    failure(new Error('Failed!'))
+                } else {
+                    success('my custom var', 'custom var 2')
+                }
+            }, getRandomArbitrary(1, 3) * 1000)
+        }
+
+        // Build the queue
+        var queue = new LoadQueue.default(loaderTask, jobs)
+        for (var i = 0; i < 50; i++) {
+            queue.add('url' + i, function (url, customVar, customVar1) {
+                write('Loaded ' + url + ', vars: ' + customVar + ', ' + customVar1)
+            }, function (url, error) {
+                write('Error ' + url + ' - ' + error.message)
+            })
+        }
     }
+
+    start('log', 1)
+    start('log2', 3)
 </script>
 </body>
 </html>

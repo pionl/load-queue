@@ -129,7 +129,12 @@ export default class QueueCore {
 
         // Start the request
         this.startTimeout = setTimeout(() => {
-            this.forceStart()
+            let queueEmpty = false
+            // Start enough items for concurrent jobs
+            while (queueEmpty === false && this.loading.length() < this.concurrentJobs) {
+                // If force start returns false, the queue is empty - stop
+                queueEmpty = this.forceStart() === false
+            }
         }, this.startTimeoutTime) // 50ms is enough to handle scroll start -> cancel transitions
     }
 
